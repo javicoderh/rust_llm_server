@@ -3,6 +3,8 @@ use crate::models::gemini::{GeminiRequest, Content, Part, GeminiResponse};
 use std::env;
 use dotenvy::dotenv;
 
+const SYSTEM_PROMPT: &str = "You are a helpful and concise assistant. Please format your response using Markdown. Use paragraphs and lists where appropriate to ensure readability.";
+
 pub async fn process_chat(req: ChatRequest) -> ChatResponse {
     dotenv().ok();
     let api_key = env::var("GEMINI_API_KEY").expect("GEMINI_API_KEY must be set");
@@ -13,7 +15,7 @@ pub async fn process_chat(req: ChatRequest) -> ChatResponse {
 
     let gemini_req = GeminiRequest {
         contents: vec![Content {
-            parts: vec![Part { text: req.message }],
+            parts: vec![Part { text: format!("{}\n\nUser: {}", SYSTEM_PROMPT, req.message) }],
             role: Some("user".to_string()),
         }],
     };
